@@ -29,6 +29,8 @@ class CTC(model.Model):
 
         # LayerNorm Point 1
         m = nn.LayerNorm(x.size()[1:])
+        if self.is_cuda:
+            m = m.cuda()
         x = m(x)
         # End
 

@@ -75,6 +75,8 @@ class Seq2Seq(model.Model):
         # LayerNorm Point 1
 
         # m = nn.LayerNorm(x.size()[1:])
+        #if self.is_cuda:
+        #    m = m.cuda()
         # x = m(x)
 
         #End
@@ -123,6 +125,8 @@ class Seq2Seq(model.Model):
             # LayerNorm Point 2.1
             nx = ox + sx
             m = nn.LayerNorm(nx.size()[1:])
+            if self.is_cuda:
+                m = m.cuda()
             nx = m(nx)
             out.append(self.fc(nx))
             # End
@@ -160,6 +164,8 @@ class Seq2Seq(model.Model):
 
         # LayerNorm Point 2.2
         m = nn.LayerNorm(out.size()[1:])
+        if self.is_cuda:
+            m = m.cuda()
         out = m(out)
         # End
 
