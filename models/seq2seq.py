@@ -21,12 +21,12 @@ class Seq2Seq(model.Model):
         rnn_dim = self.encoder_dim
         embed_dim = decoder_cfg["embedding_dim"]
         self.embedding = nn.Embedding(vocab_size, embed_dim)
-        self.dec_rnn = nn.GRUCell(input_size=embed_dim,
-                                  hidden_size=rnn_dim)
+        # self.dec_rnn = nn.GRUCell(input_size=embed_dim,
+        #                           hidden_size=rnn_dim)
 
         #LayerNorm Point 3
 
-        #self.dec_rnn = layernormGRU.LayerNormGRUCell(input_size=embed_dim, hidden_size=rnn_dim)
+        self.dec_rnn = layernormGRU.LayerNormGRUCell(input_size=embed_dim, hidden_size=rnn_dim)
 
         #End
 
@@ -123,15 +123,15 @@ class Seq2Seq(model.Model):
             aligns.append(ax)
 
             # LayerNorm Point 2.1
-            nx = ox + sx
-            m = nn.LayerNorm(nx.size()[1:])
-            if self.is_cuda:
-                m = m.cuda()
-            nx = m(nx)
-            out.append(self.fc(nx))
+            # nx = ox + sx
+            # m = nn.LayerNorm(nx.size()[1:])
+            # if self.is_cuda:
+            #     m = m.cuda()
+            # nx = m(nx)
+            # out.append(self.fc(nx))
             # End
 
-            #out.append(self.fc(ox + sx))
+            out.append(self.fc(ox + sx))
 
 
         out = torch.cat(out, dim=1)
@@ -163,10 +163,10 @@ class Seq2Seq(model.Model):
         out = ox + sx
 
         # LayerNorm Point 2.2
-        m = nn.LayerNorm(out.size()[1:])
-        if self.is_cuda:
-            m = m.cuda()
-        out = m(out)
+        # m = nn.LayerNorm(out.size()[1:])
+        # if self.is_cuda:
+        #     m = m.cuda()
+        # out = m(out)
         # End
 
         out = self.fc(out.squeeze(dim=1))

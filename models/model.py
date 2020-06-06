@@ -33,14 +33,16 @@ class Model(nn.Module):
           "Convolutional ouptut frequency dimension is negative."
 
         rnn_cfg = encoder_cfg["rnn"]
-        self.rnn = nn.GRU(input_size=conv_out,
-                          hidden_size=rnn_cfg["dim"],
-                          num_layers=rnn_cfg["layers"],
-                          batch_first=True, dropout=config["dropout"],
-                          bidirectional=rnn_cfg["bidirectional"])
+        self.num_layers = rnn_cfg["layers"]
+        # self.rnn = nn.GRU(input_size=conv_out,
+        #                   hidden_size=rnn_cfg["dim"],
+        #                   num_layers=rnn_cfg["layers"],
+        #                   batch_first=True, dropout=config["dropout"],
+        #                   bidirectional=rnn_cfg["bidirectional"])
 
         # Layer Norm Point 1
-        # self.rnn = layernormGRU.LayerNormGRU(input_size=conv_out, hidden_size=rnn_cfg["dim"])
+        self.rnn = layernormGRU.LayerNormGRU(input_size=conv_out,
+                                             hidden_size=rnn_cfg["dim"])
         # End
 
         self._encoder_dim = rnn_cfg["dim"]
@@ -76,11 +78,14 @@ class Model(nn.Module):
         b, t, f, c = x.size()
         x = x.view((b, t, f * c))
 
-        x, h = self.rnn(x)
+        h = None
 
-        if self.rnn.bidirectional:
-            half = x.size()[-1] // 2
-            x = x[:, :, :half] + x[:, :, half:]
+        for i in range(self.num_layers):
+            x, h = self.rnn(x,h)
+
+        # if self.rnn.bidirectional:
+        #     half = x.size()[-1] // 2
+        #     x = x[:, :, :half] + x[:, :, half:]
 
         return x
 
